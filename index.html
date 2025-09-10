@@ -1,471 +1,437 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LADHIDH • Cafe Dashboard</title>
-  <!-- Arabic-style font (Amiri) + modern UI font -->
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital@0;1&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --gold: linear-gradient(90deg,#ffd36b,#ffcf40 40%,#ffd36b 60%);
-      --accent:#ff7a59;
-      --muted:#6b6b6b;
-      --card-shadow: 0 8px 24px rgba(18,18,18,0.08);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;
-      background: radial-gradient(circle at 10% 10%, #ffffff 0%, #f8fafc 40%, #fbfbfb 100%);
-      -webkit-font-smoothing:antialiased;
-      color:#111827;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-    }
-    /* Header / Nav */
-    header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:18px 28px;
-      gap:20px;
-      position:sticky;top:0;z-index:50;
-      backdrop-filter: blur(6px);
-      background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.55));
-      border-bottom: 1px solid rgba(0,0,0,0.04);
-    }
-    .brand{
-      display:flex;align-items:center;gap:14px;
-    }
-    .logo-wrap{
-      display:flex;align-items:center;gap:10px;
-    }
-    .logo {
-      font-family: 'Amiri', serif;
-      font-size:34px;
-      letter-spacing:6px;
-      font-weight:700;
-      line-height:1;
-      background: var(--gold);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 2px 8px rgba(255,207,80,0.12);
-    }
-    .logo-sub{
-      font-size:12px;color:var(--muted);margin-top:4px;margin-left:2px;
-    }
-    nav ul{display:flex;gap:14px;align-items:center;list-style:none;padding:0;margin:0}
-    nav a{padding:8px 12px;border-radius:8px;text-decoration:none;color:#111;font-weight:600}
-    nav a:hover{background:rgba(255,122,89,0.08)}
-
-    /* main container */
-    .container{max-width:1200px;margin:20px auto;padding:0 20px;display:grid;grid-template-columns: 260px 1fr;gap:24px;align-items:start}
-
-    /* Sidebar */
-    .sidebar{background:linear-gradient(180deg,#ffffff,#fbfbfb);border-radius:14px;padding:18px;box-shadow:var(--card-shadow)}
-    .search{display:flex;gap:8px;align-items:center;padding:8px;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.04)}
-    .search input{border:0;outline:0;font-size:14px;padding:10px;width:100%}
-    .filters{margin-top:14px}
-    .filters h4{margin:8px 0 10px;font-size:13px;color:#333}
-    .chip{display:inline-block;padding:8px 10px;border-radius:999px;border:1px solid rgba(0,0,0,0.06);margin:6px 6px 0;background:transparent;cursor:pointer}
-    .chip.active{background:linear-gradient(90deg,#fff7f3,#fff6f2);border:1px solid rgba(255,122,89,0.18)}
-
-    /* Ads slider */
-    .ad-slider{margin-top:18px;border-radius:10px;overflow:hidden}
-    .ad-slide{height:120px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
-
-    /* Products & 3D showcase */
-    .content{display:flex;flex-direction:column;gap:18px}
-    .top-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .big-search{flex:1;margin:0 20px}
-    .sort-area{display:flex;gap:10px;align-items:center}
-    .btn{padding:10px 14px;border-radius:10px;border:0;background:linear-gradient(90deg,#ff8a65,#ff6b4a);color:#fff;font-weight:700;cursor:pointer}
-
-    /* center 3d card */
-    .threeD-wrap{display:flex;align-items:center;gap:18px;justify-content:center;padding:18px;background:linear-gradient(180deg,#ffffff,#fffdf8);border-radius:14px;box-shadow:var(--card-shadow)}
-    .threeD-card{width:240px;height:240px;border-radius:16px;background:linear-gradient(180deg,#fff8ef,#fff3e6);display:flex;flex-direction:column;align-items:center;justify-content:center;transform-style:preserve-3d;perspective:1000px}
-    .threeD-card .inner{width:200px;height:200px;border-radius:12px;background:url('https://images.unsplash.com/photo-1603072841682-8b0a7f668a5a?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=') center/cover;border-radius:12px;box-shadow:0 18px 40px rgba(255,122,89,0.12);transform:rotateX(10deg) rotateY(-12deg)}
-
-    /* product grid */
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-    .card{background:#fff;padding:14px;border-radius:12px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:10px}
-    .card .thumb{height:160px;border-radius:10px;background-size:cover;background-position:center}
-    .meta{display:flex;justify-content:space-between;align-items:center}
-    .price{font-weight:800}
-    .tags{font-size:12px;color:var(--muted)}
-
-    /* Cart panel */
-    .cart{position:fixed;right:18px;bottom:18px;width:360px;background:linear-gradient(180deg,#fff,#fffefc);padding:14px;border-radius:14px;box-shadow:0 20px 60px rgba(12,12,12,0.15)}
-    .cart h4{margin:0 0 12px}
-    .cart-list{max-height:260px;overflow:auto}
-    .cart-item{display:flex;gap:10px;align-items:center;margin-bottom:10px}
-    .cart .checkout{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
-
-    /* payment modal */
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);z-index:60}
-    .modal.open{display:flex}
-    .modal-card{width:520px;background:#fff;padding:20px;border-radius:10px}
-    .pmethods{display:flex;gap:12px;flex-wrap:wrap}
-    .pmethod{padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);cursor:pointer}
-
-    /* footer */
-    footer{margin-top:40px;padding:30px 20px;text-align:center;color:var(--muted);font-size:13px}
-
-    /* responsive */
-    @media (max-width:1000px){
-      .container{grid-template-columns:1fr;}
-      .grid{grid-template-columns:repeat(2,1fr)}
-      .cart{width:320px}
-    }
-    @media (max-width:640px){
-      .grid{grid-template-columns:1fr}
-      header{flex-direction:column;align-items:stretch}
-      .logo{font-size:28px}
-      .brand{justify-content:space-between}
-      .cart{right:10px;left:10px}
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LADHIDH - Cafe & Bistro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Three.js CDN for 3D model -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            min-height: 100vh;
+        }
+        .arab-font {
+            font-family: 'Cairo', sans-serif;
+        }
+        .gold-text {
+            background: linear-gradient(45deg, #FFD700, #DAA520, #FFD700, #DAA520);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s ease-in-out infinite;
+        }
+        @keyframes shine {
+            0% { background-position: 100% 50%; }
+            50% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        .scroll-ad {
+            animation: scroll 30s linear infinite;
+        }
+        @keyframes scroll {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100%); }
+        }
+        /* Custom modal styling */
+        .modal {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+    </style>
 </head>
-<body>
-  <header>
-    <div class="brand">
-      <div class="logo-wrap">
-        <div class="logo">LADHIDH</div>
-        <div class="logo-sub">Premium Cafe • Authentic Flavours</div>
-      </div>
-    </div>
+<body class="flex flex-col items-center">
 
-    <nav aria-label="main nav">
-      <ul>
-        <li><a href="#home">Home</a></li>
-        <li><a href="#menu">Menu</a></li>
-        <li><a href="#prices">Prices</a></li>
-        <li><a href="#categories">Categories</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
+    <!-- Main Container -->
+    <div class="relative w-full max-w-7xl mx-auto p-4 md:p-8">
 
-    <div style="display:flex;gap:10px;align-items:center">
-      <button class="btn" id="openCart">My Cart (<span id="cart-count">0</span>)</button>
-    </div>
-  </header>
-
-  <main class="container">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="search">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="#999" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#999" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <input id="side-search" placeholder="Search menu, e.g. Pizza" />
-      </div>
-
-      <div class="filters">
-        <h4>Category</h4>
-        <div>
-          <button class="chip active" data-cat="all">All</button>
-          <button class="chip" data-cat="pizza">Pizza</button>
-          <button class="chip" data-cat="coffee">Coffee</button>
-          <button class="chip" data-cat="dessert">Dessert</button>
-          <button class="chip" data-cat="sandwich">Sandwich</button>
-          <button class="chip" data-cat="drinks">Drinks</button>
-        </div>
-        <h4>Price</h4>
-        <div>
-          <button class="chip" data-price="0-5">Under $5</button>
-          <button class="chip" data-price="5-15">$5–$15</button>
-          <button class="chip" data-price="15-999">$15+</button>
-        </div>
-
-        <h4>Diet</h4>
-        <div>
-          <button class="chip" data-diet="veg">Veg</button>
-          <button class="chip" data-diet="nonveg">Non-veg</button>
-          <button class="chip" data-diet="vegan">Vegan</button>
-        </div>
-      </div>
-
-      <div class="ad-slider" aria-hidden="false">
-        <div style="display:flex;transition:transform 0.5s ease" id="ad-track">
-          <div class="ad-slide" style="min-width:100% ;background:linear-gradient(90deg,#fff7f0,#fff1e8);">Special: Flat 10% off on Orders Above $20</div>
-          <div class="ad-slide" style="min-width:100% ;background:linear-gradient(90deg,#f8fff2,#f0fff4);">Try our new Cold Brew — Limited Time</div>
-          <div class="ad-slide" style="min-width:100% ;background:linear-gradient(90deg,#f7f0ff,#f0f8ff);">Weekend Brunch — Reserve Now</div>
-        </div>
-      </div>
-
-    </aside>
-
-    <!-- Main content -->
-    <section class="content">
-      <div class="top-row">
-        <div style="display:flex;align-items:center;gap:12px">
-          <h2 id="home">Welcome to LADHIDH</h2>
-          <div style="color:var(--muted);font-size:14px">• Authentic cafe vibes • Order online</div>
-        </div>
-
-        <div class="sort-area">
-          <div class="big-search">
-            <div class="search">
-              <input id="global-search" placeholder="Search for dishes, e.g. Margherita, Latte..." />
-              <button class="btn" id="searchBtn">Search</button>
+        <!-- Header and Navigation -->
+        <header class="flex flex-col md:flex-row justify-between items-center bg-white shadow-xl rounded-2xl p-4 md:p-6 mb-8">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-6xl md:text-8xl font-bold gold-text arab-font tracking-wide select-none">LADHIDH</h1>
+                <p class="text-lg text-gray-500 text-center">Cafe & Bistro</p>
             </div>
-          </div>
-          <select id="sort" style="padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06)">
-            <option value="popular">Most Popular</option>
-            <option value="low">Price: Low to High</option>
-            <option value="high">Price: High to Low</option>
-            <option value="new">New Items</option>
-          </select>
-        </div>
-      </div>
+            <nav class="flex flex-wrap justify-center gap-4">
+                <a href="#" onclick="showSection('home')" class="nav-link text-gray-700 hover:text-amber-500 font-bold transition-colors duration-300">Home</a>
+                <a href="#" onclick="showSection('menu')" class="nav-link text-gray-700 hover:text-amber-500 font-bold transition-colors duration-300">Menu</a>
+                <a href="#" onclick="showSection('contact')" class="nav-link text-gray-700 hover:text-amber-500 font-bold transition-colors duration-300">Contact</a>
+                <button onclick="openCart()" class="text-white bg-amber-500 hover:bg-amber-600 px-4 py-2 rounded-full font-bold transition-colors duration-300 shadow-md">
+                    My Cart (<span id="cart-count">0</span>)
+                </button>
+            </nav>
+        </header>
 
-      <!-- 3D showcase and categories -->
-      <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:stretch">
-        <div class="threeD-wrap" style="flex:0 0 360px">
-          <div class="threeD-card">
-            <div class="inner" id="threeD-img" title="Featured Item"></div>
-          </div>
+        <!-- Search Bar -->
+        <div class="w-full mb-8">
+            <input type="text" id="search-input" placeholder="Search for food items..." class="w-full p-4 pl-12 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all duration-300 text-lg">
         </div>
 
-        <div style="flex:1;min-width:220px">
-          <h3 id="menu">Menu Highlights</h3>
-          <p style="color:var(--muted);margin-top:6px">Browse real offerings with pictures, prices and quick order options.
-          </p>
+        <!-- Main Content Area -->
+        <main class="w-full flex">
+            <!-- Left Content (Main Sections) -->
+            <div class="flex-1 rounded-2xl p-4 md:p-8 bg-white shadow-xl">
 
-          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-            <button class="chip" data-feature="pizza">Best Pizza</button>
-            <button class="chip" data-feature="coffee">Signature Coffee</button>
-            <button class="chip" data-feature="dessert">Desserts</button>
-            <button class="chip" data-feature="combo">Combos</button>
-          </div>
+                <!-- Home Section -->
+                <section id="home-section" class="main-section">
+                    <div class="w-full h-96 bg-cover bg-center rounded-2xl shadow-lg mb-8" style="background-image: url('https://placehold.co/1200x400/FFD700/000000?text=Welcome+to+LADHIDH');"></div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to LADHIDH!</h2>
+                    <p class="text-gray-600 text-lg mb-6">
+                        Experience a culinary journey of authentic flavors and modern delights. Our menu is crafted with passion to bring you the best in every bite and sip. Explore our categories and find your new favorite.
+                    </p>
+                </section>
+
+                <!-- Menu Section -->
+                <section id="menu-section" class="main-section hidden">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">Our Menu</h2>
+                    
+                    <!-- Categories & Filters -->
+                    <div class="flex flex-wrap justify-center gap-4 mb-8">
+                        <button class="filter-btn text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors duration-300 active" data-category="all">All</button>
+                        <button class="filter-btn text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors duration-300" data-category="pizza">Pizzas</button>
+                        <button class="filter-btn text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors duration-300" data-category="coffee">Coffee</button>
+                        <button class="filter-btn text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors duration-300" data-category="desserts">Desserts</button>
+                        <button class="filter-btn text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors duration-300" data-category="sandwiches">Sandwiches</button>
+                        <button class="filter-btn text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors duration-300" data-category="juices">Juices</button>
+                    </div>
+
+                    <!-- 3D Item in the middle -->
+                    <div class="w-full flex justify-center items-center h-64 my-8">
+                        <canvas id="food-3d-canvas" class="w-full h-full"></canvas>
+                    </div>
+
+                    <!-- Food Items Grid -->
+                    <div id="food-items-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Food Item Cards will be injected here by JS -->
+                    </div>
+                </section>
+
+                <!-- Contact Section -->
+                <section id="contact-section" class="main-section hidden">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">Contact Us</h2>
+                    <div class="text-center text-lg text-gray-600 space-y-4">
+                        <p>📍 123 LADHIDH Avenue, City, Country</p>
+                        <p>📞 +1 (123) 456-7890</p>
+                        <p>📧 info@ladhidh.cafe</p>
+                        <p>Our hours are Mon-Sat, 9:00 AM - 10:00 PM</p>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Right Side Advertisements -->
+            <aside class="hidden lg:block w-64 ml-8 rounded-2xl bg-white shadow-xl p-4 overflow-hidden">
+                <div class="h-full relative overflow-hidden">
+                    <div class="scroll-ad space-y-8">
+                        <div class="w-full h-64 bg-cover bg-center rounded-xl shadow-lg" style="background-image: url('https://placehold.co/300x200/50C878/FFFFFF?text=New+Healthy+Salad!');"></div>
+                        <div class="w-full h-64 bg-cover bg-center rounded-xl shadow-lg" style="background-image: url('https://placehold.co/300x200/B2BEB5/000000?text=Try+Our+Latte!');"></div>
+                        <div class="w-full h-64 bg-cover bg-center rounded-xl shadow-lg" style="background-image: url('https://placehold.co/300x200/F08080/FFFFFF?text=Spicy+Chicken+Wings!');"></div>
+                        <div class="w-full h-64 bg-cover bg-center rounded-xl shadow-lg" style="background-image: url('https://placehold.co/300x200/DAA520/FFFFFF?text=Golden+Waffles!');"></div>
+                        <!-- Duplicates for seamless scrolling -->
+                        <div class="w-full h-64 bg-cover bg-center rounded-xl shadow-lg" style="background-image: url('https://placehold.co/300x200/50C878/FFFFFF?text=New+Healthy+Salad!');"></div>
+                        <div class="w-full h-64 bg-cover bg-center rounded-xl shadow-lg" style="background-image: url('https://placehold.co/300x200/B2BEB5/000000?text=Try+Our+Latte!');"></div>
+                        <div class="w-full h-64 bg-cover bg-center rounded-xl shadow-lg" style="background-image: url('https://placehold.co/300x200/F08080/FFFFFF?text=Spicy+Chicken+Wings!');"></div>
+                        <div class="w-full h-64 bg-cover bg-center rounded-xl shadow-lg" style="background-image: url('https://placehold.co/300x200/DAA520/FFFFFF?text=Golden+Waffles!');"></div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Cart Modal -->
+        <div id="cart-modal" class="modal fixed inset-0 flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-xl max-h-[80vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-3xl font-bold">Your Cart</h3>
+                    <button onclick="closeCart()" class="text-gray-500 hover:text-gray-800 transition-colors duration-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div id="cart-items-list" class="space-y-4">
+                    <!-- Cart items will be injected here -->
+                </div>
+                <div id="cart-summary" class="mt-6 pt-4 border-t border-gray-200">
+                    <div class="flex justify-between items-center font-bold text-lg mb-4">
+                        <span>Total:</span>
+                        <span id="cart-total-price">₹0.00</span>
+                    </div>
+                    <button onclick="openPaymentModal()" class="w-full bg-green-500 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors duration-300 shadow-md">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <!-- Grid of food items -->
-      <div class="grid" id="products" style="margin-top:6px">
-        <!-- Cards will be injected by JS -->
-      </div>
-
-      <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center">
-        <div style="color:var(--muted)">Showing <span id="showing-count">0</span> items</div>
-        <div style="display:flex;gap:10px">
-          <button class="btn" id="viewMore">View More</button>
-          <button class="btn" id="checkoutNow">Checkout</button>
+        <!-- Payment Modal -->
+        <div id="payment-modal" class="modal fixed inset-0 flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-3xl font-bold">Payment Method</h3>
+                    <button onclick="closePaymentModal()" class="text-gray-500 hover:text-gray-800 transition-colors duration-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <label class="flex items-center space-x-3 text-lg">
+                        <input type="radio" name="paymentMethod" value="UPI" checked class="form-radio text-amber-500">
+                        <span>UPI</span>
+                    </label>
+                    <label class="flex items-center space-x-3 text-lg">
+                        <input type="radio" name="paymentMethod" value="Credit Card" class="form-radio text-amber-500">
+                        <span>Credit Card</span>
+                    </label>
+                    <label class="flex items-center space-x-3 text-lg">
+                        <input type="radio" name="paymentMethod" value="Cash on Delivery" class="form-radio text-amber-500">
+                        <span>Cash on Delivery</span>
+                    </label>
+                </div>
+                <button onclick="processPayment()" class="w-full bg-green-500 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors duration-300 shadow-md mt-6">
+                    Place Order
+                </button>
+            </div>
         </div>
-      </div>
 
-    </section>
-  </main>
+        <!-- Success Modal -->
+        <div id="success-modal" class="modal fixed inset-0 flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
+                <svg class="w-24 h-24 mx-auto mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <h3 class="text-3xl font-bold mb-2">Order Placed!</h3>
+                <p id="success-message" class="text-gray-600 mb-6">Your order has been successfully placed. Thank you for your purchase!</p>
+                <button onclick="closeSuccessModal()" class="w-full bg-green-500 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors duration-300 shadow-md">
+                    Continue Shopping
+                </button>
+            </div>
+        </div>
 
-  <!-- Cart (hidden until opened) -->
-  <aside class="cart" id="cartPanel" aria-hidden="true" style="display:none">
-    <h4>Your Order</h4>
-    <div class="cart-list" id="cart-list">
-      <div style="color:var(--muted);">Cart is empty — add some tasty items!</div>
     </div>
 
-    <div class="checkout">
-      <div>
-        <div style="font-size:13px;color:var(--muted)">Subtotal</div>
-        <div style="font-weight:800;font-size:18px" id="subtotal">$0.00</div>
-      </div>
-      <div>
-        <button class="btn" id="payBtn">Pay</button>
-      </div>
-    </div>
-  </aside>
+    <!-- JavaScript for Functionality -->
+    <script>
+        // Data for the food items
+        const foodItems = [
+            { id: 1, name: "Margherita Pizza", price: 650, category: "pizza", image: "https://placehold.co/400x300/e8434a/ffffff?text=Pizza" },
+            { id: 2, name: "Espresso", price: 150, category: "coffee", image: "https://placehold.co/400x300/775c4b/ffffff?text=Espresso" },
+            { id: 3, name: "Chocolate Cake", price: 350, category: "desserts", image: "https://placehold.co/400x300/3d2c2c/ffffff?text=Cake" },
+            { id: 4, name: "Vegetarian Pizza", price: 720, category: "pizza", image: "https://placehold.co/400x300/98b350/ffffff?text=Veggie+Pizza" },
+            { id: 5, name: "Latte Macchiato", price: 220, category: "coffee", image: "https://placehold.co/400x300/f8f8f8/000000?text=Latte" },
+            { id: 6, name: "Cheesecake", price: 400, category: "desserts", image: "https://placehold.co/400x300/966453/ffffff?text=Cheesecake" },
+            { id: 7, name: "Grilled Chicken Sandwich", price: 380, category: "sandwiches", image: "https://placehold.co/400x300/f0e68c/000000?text=Chicken+Sandwich" },
+            { id: 8, name: "Falafel Wrap", price: 320, category: "sandwiches", image: "https://placehold.co/400x300/7b68ee/ffffff?text=Falafel+Wrap" },
+            { id: 9, name: "Club Sandwich", price: 450, category: "sandwiches", image: "https://placehold.co/400x300/d2b48c/000000?text=Club+Sandwich" },
+            { id: 10, name: "Fresh Orange Juice", price: 180, category: "juices", image: "https://placehold.co/400x300/ffa500/ffffff?text=Orange+Juice" },
+            { id: 11, name: "Mango Smoothie", price: 250, category: "juices", image: "https://placehold.co/400x300/ff7f50/ffffff?text=Mango+Smoothie" },
+            { id: 12, name: "Mixed Berry Smoothie", price: 270, category: "juices", image: "https://placehold.co/400x300/c71585/ffffff?text=Berry+Smoothie" },
+            { id: 13, name: "Brownie Sundae", price: 420, category: "desserts", image: "https://placehold.co/400x300/a0522d/ffffff?text=Brownie+Sundae" },
+            { id: 14, name: "Caprese Salad", price: 580, category: "pizza", image: "https://placehold.co/400x300/008000/ffffff?text=Caprese+Pizza" },
+            { id: 15, name: "Iced Caramel Macchiato", price: 290, category: "coffee", image: "https://placehold.co/400x300/b87333/ffffff?text=Iced+Macchiato" },
+        ];
 
-  <!-- Payment Modal -->
-  <div class="modal" id="modal">
-    <div class="modal-card">
-      <h3>Checkout</h3>
-      <p style="color:var(--muted);margin-top:6px">Choose a payment method</p>
-      <div class="pmethods" style="margin-top:12px">
-        <div class="pmethod" data-method="card">Credit / Debit Card</div>
-        <div class="pmethod" data-method="upi">UPI</div>
-        <div class="pmethod" data-method="cash">Cash on Delivery</div>
-        <div class="pmethod" data-method="wallet">Wallet</div>
-      </div>
+        let cart = [];
 
-      <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:10px">
-        <button class="chip" id="closeModal">Cancel</button>
-        <button class="btn" id="confirmPay">Confirm & Pay</button>
-      </div>
-    </div>
-  </div>
+        // Function to render food items based on filter and search
+        function renderFoodItems(category = 'all', searchTerm = '') {
+            const container = document.getElementById('food-items-container');
+            container.innerHTML = '';
+            
+            const filteredItems = foodItems.filter(item => {
+                const categoryMatch = category === 'all' || item.category === category;
+                const searchMatch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+                return categoryMatch && searchMatch;
+            });
 
-  <footer id="contact">© LADHIDH Cafe — crafted with care • Contact: +1 (555) 0123</footer>
+            if (filteredItems.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 col-span-full">No items found in this category or search.</p>';
+                return;
+            }
 
-  <script>
-    /* Sample data for the cafe items. Images use Unsplash random-ish food images. */
-    const products = [
-      {id:1,name:'Margherita Pizza',price:9.99,cat:'pizza',tags:['veg'],img:'https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s='},
-      {id:2,name:'Pepperoni Pizza',price:12.50,cat:'pizza',tags:['nonveg'],img:'https://images.unsplash.com/photo-1548365328-5b1a9c9fef9c?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s='},
-      {id:3,name:'Cappuccino',price:4.50,cat:'coffee',tags:['veg'],img:'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s='},
-      {id:4,name:'Cold Brew',price:5.00,cat:'coffee',tags:['veg'],img:'https://images.unsplash.com/photo-1510627498534-cf7e9002facc?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s='},
-      {id:5,name:'Chocolate Cake Slice',price:6.75,cat:'dessert',tags:['veg'],img:'https://images.unsplash.com/photo-1543353071-873f17a7a088?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s='},
-      {id:6,name:'Grilled Sandwich',price:7.25,cat:'sandwich',tags:['nonveg'],img:'https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s='},
-      {id:7,name:'Caesar Salad',price:6.00,cat:'drinks',tags:['veg'],img:'https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s='},
-      {id:8,name:'Blueberry Muffin',price:3.50,cat:'dessert',tags:['veg'],img:'https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s='},
-      {id:9,name:'Iced Latte',price:4.95,cat:'coffee',tags:['veg'],img:'https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s='}
-    ];
+            filteredItems.forEach(item => {
+                const itemCard = `
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition-transform duration-300 hover:scale-105">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="text-xl font-bold text-gray-800">${item.name}</h3>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-2xl font-bold text-amber-500">₹${item.price.toFixed(2)}</span>
+                                <button onclick="addToCart(${item.id})" class="bg-amber-500 text-white rounded-full px-4 py-2 text-sm font-bold shadow-md hover:bg-amber-600 transition-colors duration-300">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += itemCard;
+            });
+        }
 
-    // state
-    const state = {cart:[]};
-
-    // populate products
-    const productsEl = document.getElementById('products');
-    const showingCount = document.getElementById('showing-count');
-
-    function renderProducts(list){
-      productsEl.innerHTML = '';
-      list.forEach(p=>{
-        const div = document.createElement('div');div.className='card';
-        div.innerHTML = `
-          <div class="thumb" style="background-image:url('${p.img}&auto=format&fit=crop&w=800&q=80')"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <div style="font-weight:700">${p.name}</div>
-              <div class="tags">${p.cat} • ${p.tags.join(', ')}</div>
-            </div>
-            <div style="text-align:right">
-              <div class="price">$${p.price.toFixed(2)}</div>
-              <div style="margin-top:8px"><button class="chip" data-add="${p.id}">Add</button></div>
-            </div>
-          </div>
-        `;
-        productsEl.appendChild(div);
-      });
-      showingCount.textContent = list.length;
-    }
-
-    // initial render
-    renderProducts(products);
-
-    // search & filter handlers
-    document.getElementById('searchBtn').addEventListener('click', ()=>{
-      const q = document.getElementById('global-search').value.trim().toLowerCase();
-      const filtered = products.filter(p=>p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q));
-      renderProducts(filtered);
-    });
-
-    document.getElementById('side-search').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ document.getElementById('global-search').value = e.target.value; document.getElementById('searchBtn').click(); }});
-
-    // chips
-    document.querySelectorAll('.chip[data-cat]').forEach(ch=>ch.addEventListener('click', (ev)=>{
-      document.querySelectorAll('.chip[data-cat]').forEach(c=>c.classList.remove('active'));
-      ev.currentTarget.classList.add('active');
-      const cat = ev.currentTarget.dataset.cat;
-      if(cat==='all') renderProducts(products); else renderProducts(products.filter(p=>p.cat===cat));
-    }));
-
-    // add to cart
-    document.body.addEventListener('click', (e)=>{
-      const id = e.target.dataset.add;
-      if(id){ const prod = products.find(p=>p.id==id); if(prod){ addToCart(prod); }}
-    });
-
-    function addToCart(prod){
-      const existing = state.cart.find(i=>i.id===prod.id);
-      if(existing) existing.qty++; else state.cart.push({id:prod.id,name:prod.name,price:prod.price,qty:1});
-      updateCartUI();
-    }
-
-    function updateCartUI(){
-      const listEl = document.getElementById('cart-list');
-      const countEl = document.getElementById('cart-count');
-      listEl.innerHTML = '';
-      if(state.cart.length===0){ listEl.innerHTML = '<div style="color:var(--muted)">Cart is empty — add some tasty items!</div>' }
-      else{
-        state.cart.forEach(item=>{
-          const itemEl = document.createElement('div');itemEl.className='cart-item';
-          itemEl.innerHTML = `<div style="width:54px;height:54px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;border:1px solid rgba(0,0,0,0.04)">${item.name.split(' ')[0]}</div>
-            <div style="flex:1">
-              <div style="font-weight:700">${item.name}</div>
-              <div style="font-size:13px;color:var(--muted)">$${item.price.toFixed(2)} x ${item.qty}</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-weight:800">$${(item.price*item.qty).toFixed(2)}</div>
-              <div style="margin-top:6px;display:flex;gap:6px;justify-content:flex-end">
-                <button class="chip" data-dec="${item.id}">-</button>
-                <button class="chip" data-inc="${item.id}">+</button>
-                <button class="chip" data-rem="${item.id}">Remove</button>
-              </div>
-            </div>`;
-          listEl.appendChild(itemEl);
+        // Event listeners for filters and search
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelector('.filter-btn.active')?.classList.remove('active');
+                button.classList.add('active');
+                renderFoodItems(button.dataset.category);
+            });
         });
-      }
-      const subtotal = state.cart.reduce((s,i)=>s + i.price*i.qty,0);
-      document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
-      countEl.textContent = state.cart.reduce((s,i)=>s+i.qty,0);
-    }
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const category = document.querySelector('.filter-btn.active').dataset.category;
+            renderFoodItems(category, e.target.value);
+        });
 
-    document.body.addEventListener('click', (e)=>{
-      if(e.target.dataset.inc){ const id=+e.target.dataset.inc; const it=state.cart.find(i=>i.id===id); if(it){it.qty++; updateCartUI();}} 
-      if(e.target.dataset.dec){ const id=+e.target.dataset.dec; const it=state.cart.find(i=>i.id===id); if(it){ it.qty = Math.max(1,it.qty-1); updateCartUI(); }}
-      if(e.target.dataset.rem){ const id=+e.target.dataset.rem; state.cart = state.cart.filter(i=>i.id!==id); updateCartUI(); }
-    });
+        // Functions for navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.main-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(`${sectionId}-section`).classList.remove('hidden');
+        }
 
-    // open/close cart
-    document.getElementById('openCart').addEventListener('click', ()=>{
-      const panel = document.getElementById('cartPanel');
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    });
+        // Cart functions
+        function addToCart(itemId) {
+            const item = foodItems.find(i => i.id === itemId);
+            if (item) {
+                const existingItem = cart.find(i => i.id === itemId);
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cart.push({ ...item, quantity: 1 });
+                }
+                updateCartUI();
+            }
+        }
 
-    // checkout
-    document.getElementById('payBtn').addEventListener('click', ()=>{
-      if(state.cart.length===0){ alert('Your cart is empty.'); return; }
-      document.getElementById('modal').classList.add('open');
-    });
-    document.getElementById('checkoutNow').addEventListener('click', ()=>document.getElementById('payBtn').click());
-    document.getElementById('closeModal').addEventListener('click', ()=>document.getElementById('modal').classList.remove('open'));
+        function updateCartUI() {
+            const cartList = document.getElementById('cart-items-list');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('cart-total-price');
+            
+            cartList.innerHTML = '';
+            let total = 0;
 
-    document.getElementById('confirmPay').addEventListener('click', ()=>{
-      // fake payment flow
-      const subtotal = state.cart.reduce((s,i)=>s + i.price*i.qty,0);
-      alert('Payment successful! Total charged: $' + subtotal.toFixed(2) + '\nThank you for ordering from LADHIDH.');
-      state.cart = []; updateCartUI(); document.getElementById('modal').classList.remove('open');
-    });
+            if (cart.length === 0) {
+                cartList.innerHTML = '<p class="text-center text-gray-500">Your cart is empty.</p>';
+                document.querySelector('#cart-summary button').disabled = true;
+                document.querySelector('#cart-summary button').classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                document.querySelector('#cart-summary button').disabled = false;
+                document.querySelector('#cart-summary button').classList.remove('opacity-50', 'cursor-not-allowed');
+                cart.forEach(item => {
+                    const itemHtml = `
+                        <div class="flex justify-between items-center bg-gray-100 p-3 rounded-xl shadow-sm">
+                            <div class="flex-1">
+                                <h4 class="font-bold">${item.name}</h4>
+                                <p class="text-gray-500 text-sm">₹${item.price.toFixed(2)} x ${item.quantity}</p>
+                            </div>
+                            <span class="font-bold">₹${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                    `;
+                    cartList.innerHTML += itemHtml;
+                    total += item.price * item.quantity;
+                });
+            }
+            cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartTotal.textContent = `₹${total.toFixed(2)}`;
+        }
 
-    // ad slider
-    (function(){
-      const track = document.getElementById('ad-track');
-      let idx=0;
-      setInterval(()=>{
-        idx = (idx+1) % 3;
-        track.style.transform = `translateX(-${idx*100}%)`;
-      },3500);
-    })();
+        function openCart() {
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
 
-    // threeD featured image rotate on mouse move
-    (function(){
-      const c = document.querySelector('.threeD-card .inner');
-      document.querySelector('.threeD-card').addEventListener('mousemove',(e)=>{
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        c.style.transform = `rotateX(${y*12}deg) rotateY(${x*18}deg)`;
-      });
-      document.querySelector('.threeD-card').addEventListener('mouseleave',()=>{ c.style.transform='rotateX(10deg) rotateY(-12deg)'; });
-    })();
+        function closeCart() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
 
-    // set featured image randomly
-    (function(){
-      const idx = Math.floor(Math.random()*products.length);
-      const url = products[idx].img + '&auto=format&fit=crop&w=1000&q=80';
-      document.getElementById('threeD-img').style.backgroundImage = `url('${url}')`;
-    })();
+        function openPaymentModal() {
+            closeCart();
+            document.getElementById('payment-modal').classList.remove('hidden');
+        }
 
-    // small enhancements: chips for quick add
-    document.querySelectorAll('button[data-feature]').forEach(btn=>btn.addEventListener('click', ()=>{
-      const f = btn.dataset.feature;
-      const subset = products.filter(p=>p.cat.includes(f) || p.name.toLowerCase().includes(f));
-      renderProducts(subset.length?subset:products);
-    }));
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.add('hidden');
+        }
 
-    // initialize
-    updateCartUI();
-  </script>
+        function openSuccessModal(message) {
+            document.getElementById('success-message').textContent = message;
+            document.getElementById('success-modal').classList.remove('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+        }
+        
+        function processPayment() {
+            const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            closePaymentModal();
+            let successMessage = '';
+
+            switch (selectedPaymentMethod) {
+                case 'UPI':
+                    successMessage = 'Your UPI payment is being processed. Thank you for your order!';
+                    break;
+                case 'Credit Card':
+                    successMessage = 'Your credit card payment is successful. Thank you for your order!';
+                    break;
+                case 'Cash on Delivery':
+                    successMessage = 'Your order has been placed successfully. You will pay with cash on delivery.';
+                    break;
+                default:
+                    successMessage = 'Your order has been placed. Thank you for your purchase!';
+                    break;
+            }
+
+            openSuccessModal(successMessage);
+            cart = []; // Clear cart after checkout
+            updateCartUI();
+        }
+
+
+        // 3D Model setup using Three.js
+        window.onload = function() {
+            const canvas = document.getElementById('food-3d-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setClearColor(0x000000, 0);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Create a 3D torus knot shape as a stylized donut
+            const geometry = new THREE.TorusKnotGeometry(2.5, 0.8, 100, 16);
+            const material = new THREE.MeshPhongMaterial({ color: 0xDAA520, shininess: 100, specular: 0xFFD700 });
+            const donut = new THREE.Mesh(geometry, material);
+            scene.add(donut);
+
+            // Add lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 10, 5).normalize();
+            scene.add(directionalLight);
+
+            camera.position.z = 8;
+
+            // Animation loop
+            const animate = () => {
+                requestAnimationFrame(animate);
+                donut.rotation.x += 0.005;
+                donut.rotation.y += 0.005;
+                renderer.render(scene, camera);
+            };
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                const width = canvas.clientWidth;
+                const height = canvas.clientHeight;
+                renderer.setSize(width, height);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+            });
+
+            animate();
+            renderFoodItems(); // Initial rendering of food items
+        };
+    </script>
 </body>
 </html>
